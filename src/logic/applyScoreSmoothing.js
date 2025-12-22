@@ -1,8 +1,19 @@
 export function applyScoreSmoothing(score, roleProfile, resumeSignals) {
+  // Edge case: invalid inputs
+  if (typeof score !== 'number' || isNaN(score)) {
+    return 0;
+  }
+  
+  if (!roleProfile || !resumeSignals) {
+    return Math.max(0, Math.min(100, Math.round(score)));
+  }
+
   let adjustment = 0;
 
   // Slight bonus for production exposure depth
-  if (resumeSignals.environmentExposure.includes("production")) {
+  if (resumeSignals.environmentExposure && 
+      Array.isArray(resumeSignals.environmentExposure) &&
+      resumeSignals.environmentExposure.includes("production")) {
     adjustment += 1.5;
   }
 
@@ -22,5 +33,6 @@ export function applyScoreSmoothing(score, roleProfile, resumeSignals) {
     adjustment += 1;
   }
 
-  return Math.round(score + adjustment);
+  const finalScore = score + adjustment;
+  return Math.max(0, Math.min(100, Math.round(finalScore)));
 }

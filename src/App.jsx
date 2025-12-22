@@ -24,6 +24,33 @@ function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   function handleAnalyze(jd, resume, coverLetter) {
+    // Edge case: empty or invalid inputs
+    if (!jd || typeof jd !== 'string' || jd.trim().length === 0) {
+      setAnalysis({
+        error: true,
+        title: "Invalid Job Description",
+        message: "Please provide a valid job description.",
+        guidance: [
+          "The job description field cannot be empty.",
+          "Please paste a complete job description with responsibilities and requirements."
+        ]
+      });
+      return;
+    }
+
+    if (!resume || typeof resume !== 'string' || resume.trim().length === 0) {
+      setAnalysis({
+        error: true,
+        title: "Invalid Resume",
+        message: "Please provide a valid resume.",
+        guidance: [
+          "The resume field cannot be empty.",
+          "Please paste your resume text or upload a resume file."
+        ]
+      });
+      return;
+    }
+
     if (isLowInformationJD(jd)) {
       setAnalysis({
         error: true,
@@ -75,7 +102,7 @@ function App() {
         );
         const clampedFinalScore = Math.max(0, Math.min(100, finalScore));
         const jdEvidence = extractJDEvidence(jd);
-        const resumeEvidence = extractResumeEvidence(resume);
+        const resumeEvidence = extractResumeEvidence(resume, jdEducationRequirements);
         const finalAnalysis = generateAnalysis(
           jdEvidence,
           resumeEvidence,

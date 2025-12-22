@@ -8,6 +8,18 @@
  * Risk penalties are calculated separately and applied as deductions.
  */
 export function scoreDimensions(roleProfile, resumeSignals) {
+  // Edge case: invalid inputs
+  if (!roleProfile || !resumeSignals) {
+    return {
+      relevance: 0,
+      depth: 0,
+      adaptability: 0,
+      environmentFit: 0,
+      riskPenalty: 0,
+      baseReadinessScore: 0
+    };
+  }
+
   const relevance = scoreRelevance(roleProfile, resumeSignals);
   const depth = scoreDepth(resumeSignals);
   const adaptability = scoreAdaptability(roleProfile, resumeSignals);
@@ -17,13 +29,17 @@ export function scoreDimensions(roleProfile, resumeSignals) {
   // Base readiness score sums to exactly 100 points
   const baseReadinessScore = relevance + depth + adaptability + environmentFit;
 
+  // Ensure all values are valid numbers
+  const safeBaseReadinessScore = isNaN(baseReadinessScore) ? 0 : baseReadinessScore;
+  const safeRiskPenalty = isNaN(riskPenalty) ? 0 : riskPenalty;
+
   return {
-    relevance,
-    depth,
-    adaptability,
-    environmentFit,
-    riskPenalty, // Applied separately as deduction
-    baseReadinessScore: Math.max(0, Math.min(100, baseReadinessScore))
+    relevance: isNaN(relevance) ? 0 : relevance,
+    depth: isNaN(depth) ? 0 : depth,
+    adaptability: isNaN(adaptability) ? 0 : adaptability,
+    environmentFit: isNaN(environmentFit) ? 0 : environmentFit,
+    riskPenalty: safeRiskPenalty, // Applied separately as deduction
+    baseReadinessScore: Math.max(0, Math.min(100, safeBaseReadinessScore))
   };
 }
 
@@ -92,18 +108,23 @@ function scoreAdaptability(roleProfile, resumeSignals) {
 function scoreEnvironmentFit(roleProfile, resumeSignals) {
   let score = 12; // Base score
 
+  // Edge case: ensure environmentExposure is an array
+  const environmentExposure = Array.isArray(resumeSignals.environmentExposure) 
+    ? resumeSignals.environmentExposure 
+    : [];
+
   // Production exposure bonus: +8 points if execution-heavy role
-  if (resumeSignals.environmentExposure.includes("production") &&
+  if (environmentExposure.includes("production") &&
       roleProfile.executionStyle === "execution-heavy") {
     score += 8;
-  } else if (resumeSignals.environmentExposure.includes("production")) {
+  } else if (environmentExposure.includes("production")) {
     score += 5;
   }
 
   // Penalty for academic-only experience in ambiguous role: -5 points
-  if (resumeSignals.environmentExposure.includes("academic") &&
+  if (environmentExposure.includes("academic") &&
       roleProfile.structureLevel === "ambiguous" &&
-      !resumeSignals.environmentExposure.includes("production")) {
+      !environmentExposure.includes("production")) {
     score -= 5;
   }
 

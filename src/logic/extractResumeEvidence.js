@@ -3,7 +3,9 @@
  * Every strength/gap must be backed by specific resume text
  */
 
-export function extractResumeEvidence(resumeText) {
+import { normalizeEducation, normalizeEducationRequirements } from "./normalizeEducation";
+
+export function extractResumeEvidence(resumeText, jdEducationRequirements = null) {
   const text = resumeText.toLowerCase();
 
   return {
@@ -11,7 +13,7 @@ export function extractResumeEvidence(resumeText) {
     skillDepth: extractSkillDepthEvidence(resumeText, text),
     adaptability: extractAdaptabilityEvidence(resumeText, text),
     environmentExposure: extractEnvironmentExposureEvidence(resumeText, text),
-    riskFlags: extractRiskFlagsEvidence(resumeText, text),
+    riskFlags: extractRiskFlagsEvidence(resumeText, text, jdEducationRequirements),
     education: extractEducationEvidence(resumeText)
   };
 }
@@ -265,7 +267,7 @@ function extractEnvironmentExposureEvidence(resumeText, text) {
   };
 }
 
-function extractRiskFlagsEvidence(resumeText, text) {
+function extractRiskFlagsEvidence(resumeText, text, jdEducationRequirements = null) {
   const risks = [];
   const evidence = [];
 
@@ -300,10 +302,95 @@ function extractRiskFlagsEvidence(resumeText, text) {
     });
   }
 
+  // Major mismatch detection
+  if (jdEducationRequirements && !jdEducationRequirements.openToAll) {
+    const majorMismatch = detectMajorMismatch(resumeText, jdEducationRequirements);
+    if (majorMismatch.isMismatch) {
+      risks.push("Major mismatch with role requirements");
+      const educationLines = lines.filter(line => {
+        const lowerLine = line.toLowerCase();
+        return lowerLine.includes("major") || 
+               lowerLine.includes("degree") || 
+               lowerLine.includes("bachelor") || 
+               lowerLine.includes("master") ||
+               lowerLine.includes("education");
+      });
+      evidence.push({
+        risk: "Major mismatch with role requirements",
+        explanation: majorMismatch.explanation,
+        snippets: educationLines.map(l => l.trim()).filter(l => l.length > 0).slice(0, 3)
+      });
+    }
+  }
+
   return {
     risks,
     evidence
   };
+}
+
+function detectMajorMismatch(resumeText, jdEducationRequirements) {
+  // If JD is open to all majors, no mismatch
+  if (jdEducationRequirements.openToAll) {
+    return { isMismatch: false };
+  }
+
+  // If no JD requirements specified, no mismatch
+  if (!jdEducationRequirements.rawEducationRequirements || 
+      jdEducationRequirements.rawEducationRequirements.length === 0) {
+    return { isMismatch: false };
+  }
+
+  // Extract resume education
+  const resumeEducation = extractEducationEvidence(resumeText);
+  if (!resumeEducation.background || resumeEducation.background === "unspecified") {
+    return { isMismatch: false }; // Can't determine mismatch if resume doesn't specify
+  }
+
+  // Normalize both sides for comparison
+  const jdTokens = normalizeEducationRequirements(jdEducationRequirements.rawEducationRequirements);
+  const resumeTokens = normalizeEducation(resumeEducation.background);
+
+  // If no meaningful tokens extracted, can't determine mismatch
+  if (jdTokens.length === 0 || resumeTokens.length === 0) {
+    return { isMismatch: false };
+  }
+
+  // Check for overlap
+  const jdSet = new Set(jdTokens);
+  const resumeSet = new Set(resumeTokens);
+
+  // Count matches
+  let matches = 0;
+  jdSet.forEach(token => {
+    if (resumeSet.has(token)) {
+      matches++;
+    }
+  });
+
+  // Also check for related matches (substring matches)
+  let relatedMatches = 0;
+  jdSet.forEach(jdToken => {
+    resumeSet.forEach(resumeToken => {
+      if (jdToken !== resumeToken && 
+          (jdToken.includes(resumeToken) || resumeToken.includes(jdToken))) {
+        relatedMatches++;
+      }
+    });
+  });
+
+  // If there's no match or related match, it's a mismatch
+  const hasMatch = matches > 0 || relatedMatches > 0;
+  
+  if (!hasMatch) {
+    const jdMajor = jdEducationRequirements.rawEducationRequirements[0] || "specified major";
+    return {
+      isMismatch: true,
+      explanation: `Role requires ${jdMajor}, but resume shows different major/field. This may impact eligibility.`
+    };
+  }
+
+  return { isMismatch: false };
 }
 
 function extractEducationEvidence(resumeText) {

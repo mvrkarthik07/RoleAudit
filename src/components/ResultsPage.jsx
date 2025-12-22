@@ -2,6 +2,13 @@ import { useState } from "react";
 import { trimQuote } from "../utils/trimQuote";
 import { downloadAnalysis, copyAnalysisToClipboard } from "../utils/exportAnalysis";
 
+function getScoreColor(score) {
+  if (typeof score !== 'number' || isNaN(score)) return "var(--text-primary)";
+  if (score >= 70) return "var(--success)";
+  if (score >= 40) return "var(--warning)";
+  return "var(--danger)";
+}
+
 function DimensionCard({ title, dimension, score, maxScore }) {
   const [isExpanded, setIsExpanded] = useState(false);
   
@@ -33,7 +40,7 @@ function DimensionCard({ title, dimension, score, maxScore }) {
               padding: "var(--space-1) var(--space-2)", 
               borderRadius: "4px", 
               background: "var(--bg-primary)",
-              color: getScoreColor(score),
+              color: getScoreColor((score / maxScore) * 100),
               fontSize: "var(--text-sm)",
               fontWeight: "var(--font-medium)"
             }}>
@@ -223,13 +230,7 @@ function ResultsPage({ analysis, onReset }) {
     return "score-low";
   };
 
-  const getScoreColor = (score) => {
-    if (score >= 70) return "var(--success)";
-    if (score >= 40) return "var(--warning)";
-    return "var(--danger)";
-  };
-
-     if (analysis.error) {
+  if (analysis.error) {
     return (
       <div className="card" style={{ maxWidth: "700px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "var(--space-8)" }}>
@@ -279,10 +280,10 @@ function ResultsPage({ analysis, onReset }) {
               margin: "0 0 var(--space-2)", 
               fontSize: "var(--text-4xl)", 
               fontWeight: "var(--font-bold)",
-              color: getScoreColor(score),
+              color: getScoreColor(score || 0),
               letterSpacing: "-0.02em"
             }}>
-              Overall Readiness: {score} / 100
+              Overall Readiness: {score || 0} / 100
             </h1>
             <p style={{ 
               margin: "var(--space-2) 0 0", 
@@ -348,8 +349,8 @@ function ResultsPage({ analysis, onReset }) {
               <div style={{ marginBottom: "var(--space-4)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--space-2)" }}>
                   <strong style={{ color: "var(--text-primary)", fontSize: "var(--text-sm)" }}>Base Readiness:</strong>
-                  <span style={{ color: getScoreColor(analysis.scoreExplanation.baseReadinessScore), fontWeight: "var(--font-semibold)" }}>
-                    {analysis.scoreExplanation.baseReadinessScore}/100
+                  <span style={{ color: getScoreColor(analysis.scoreExplanation?.baseReadinessScore), fontWeight: "var(--font-semibold)" }}>
+                    {analysis.scoreExplanation?.baseReadinessScore || 0}/100
                   </span>
                 </div>
                 <div style={{ 
@@ -361,14 +362,22 @@ function ResultsPage({ analysis, onReset }) {
                   borderRadius: "var(--radius-sm)",
                   lineHeight: "1.8"
                 }}>
-                  Role Alignment: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.relevance.score / analysis.scoreExplanation.dimensionBreakdown.relevance.maxScore) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.relevance.score}</span> + 
-                  Skill Realism: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.depth.score / analysis.scoreExplanation.dimensionBreakdown.depth.maxScore) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.depth.score}</span> + 
-                  Adaptability: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.adaptability.score / analysis.scoreExplanation.dimensionBreakdown.adaptability.maxScore) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.adaptability.score}</span> + 
-                  Context Fit: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.environmentFit.score / analysis.scoreExplanation.dimensionBreakdown.environmentFit.maxScore) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.environmentFit.score}</span>
+                  {analysis.scoreExplanation?.dimensionBreakdown?.relevance && (
+                    <>Role Alignment: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.relevance.score / (analysis.scoreExplanation.dimensionBreakdown.relevance.maxScore || 25)) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.relevance.score}</span> + </>
+                  )}
+                  {analysis.scoreExplanation?.dimensionBreakdown?.depth && (
+                    <>Skill Realism: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.depth.score / (analysis.scoreExplanation.dimensionBreakdown.depth.maxScore || 25)) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.depth.score}</span> + </>
+                  )}
+                  {analysis.scoreExplanation?.dimensionBreakdown?.adaptability && (
+                    <>Adaptability: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.adaptability.score / (analysis.scoreExplanation.dimensionBreakdown.adaptability.maxScore || 25)) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.adaptability.score}</span> + </>
+                  )}
+                  {analysis.scoreExplanation?.dimensionBreakdown?.environmentFit && (
+                    <>Context Fit: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.environmentFit.score / (analysis.scoreExplanation.dimensionBreakdown.environmentFit.maxScore || 25)) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.environmentFit.score}</span></>
+                  )}
                 </div>
               </div>
               
-              {analysis.scoreExplanation.riskPenalty > 0 ? (
+              {(analysis.scoreExplanation?.riskPenalty || 0) > 0 ? (
                 <div style={{ 
                   marginBottom: "var(--space-4)", 
                   padding: "var(--space-3)", 
@@ -379,11 +388,11 @@ function ResultsPage({ analysis, onReset }) {
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--space-1)" }}>
                     <strong style={{ color: "var(--text-primary)", fontSize: "var(--text-sm)" }}>Risk Deduction:</strong>
                     <span style={{ color: "var(--danger)", fontWeight: "var(--font-semibold)" }}>
-                      -{analysis.scoreExplanation.riskPenalty} points
+                      -{analysis.scoreExplanation?.riskPenalty || 0} points
                     </span>
                   </div>
                   <div style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>
-                    ({analysis.scoreExplanation.riskPenalty / 3} risk flag(s) × 3 points each)
+                    ({(analysis.scoreExplanation?.riskPenalty || 0) / 3} risk flag(s) × 3 points each)
                   </div>
                 </div>
               ) : (
@@ -399,13 +408,13 @@ function ResultsPage({ analysis, onReset }) {
               <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <strong style={{ color: "var(--text-primary)", fontSize: "var(--text-sm)" }}>Score After Risk Deduction:</strong>
-                  <span style={{ color: getScoreColor(analysis.scoreExplanation.scoreAfterRisk), fontWeight: "var(--font-semibold)" }}>
-                    {analysis.scoreExplanation.scoreAfterRisk} / 100
+                  <span style={{ color: getScoreColor(analysis.scoreExplanation?.scoreAfterRisk), fontWeight: "var(--font-semibold)" }}>
+                    {analysis.scoreExplanation?.scoreAfterRisk || 0} / 100
                   </span>
                 </div>
               </div>
               
-              {analysis.scoreExplanation.overallExplanation.score !== analysis.scoreExplanation.scoreAfterRisk && (
+              {analysis.scoreExplanation?.overallExplanation?.score !== analysis.scoreExplanation?.scoreAfterRisk && (
                 <div style={{ 
                   marginTop: "var(--space-4)", 
                   paddingTop: "var(--space-4)", 
