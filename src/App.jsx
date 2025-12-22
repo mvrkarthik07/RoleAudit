@@ -33,7 +33,7 @@ function App() {
         guidance: [
           "Paste a fuller job description with responsibilities and requirements.",
           "One-word or very short descriptions don't provide enough context.",
-          "JobLens avoids generating misleading scores when inputs are vague."
+          "RoleAudit avoids generating misleading scores when inputs are vague."
         ]
       });
       return;
@@ -126,7 +126,7 @@ function App() {
               fontWeight: "var(--font-semibold)",
               color: "var(--text-primary)"
             }}>
-              JobLens
+              RoleAudit
             </h1>
             <p style={{ 
               margin: "var(--space-1) 0 0", 
@@ -186,7 +186,7 @@ function App() {
             fontSize: "var(--text-sm)", 
             color: "var(--text-tertiary)"
           }}>
-            JobLens © {new Date().getFullYear()}
+            RoleAudit © {new Date().getFullYear()}
           </p>
         </div>
       </footer>
