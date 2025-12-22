@@ -1,16 +1,109 @@
-# React + Vite
+# JobLens
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**JobLens** is a frontend-only, evidence-based role readiness analysis tool for candidates.
 
-Currently, two official plugins are available:
+It analyzes a job description and a resume (text, PDF, or DOCX), extracts verifiable evidence from both, and explains — with proof — how well the resume aligns with the role’s actual expectations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+JobLens does **not** predict hiring outcomes, optimize resumes, or act as an ATS.
+Its goal is transparency: helping candidates understand *why* they are (or aren’t) a strong fit for a specific role.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## What JobLens Does
 
-## Expanding the ESLint configuration
+- Accepts job descriptions and resumes as plain text, PDF, or DOCX
+- Converts all resumes into editable plain text before analysis
+- Extracts evidence directly from both the JD and the resume
+- Pairs job expectations with resume evidence
+- Produces an explainable readiness score out of 100
+- Clearly shows strengths, gaps, neutral factors, and risks
+- Explains exactly where every point comes from
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Every insight is traceable to text the user provided.
+
+---
+
+## What JobLens Does NOT Do
+
+- No machine learning or embeddings
+- No resume rewriting or keyword stuffing
+- No layout or formatting scoring
+- No hiring probability predictions
+- No black-box “AI insights”
+
+JobLens is intentionally deterministic and explainable.
+
+---
+
+## Scoring Overview
+
+The score is always out of **100 points**, fully allocatable.
+
+### Base Readiness (100 points total)
+
+- **Role Alignment** (25)  
+  Alignment with the role’s execution style, learning curve, and expectations
+
+- **Skill Realism** (25)  
+  Depth and repeated usage of skills in real contexts
+
+- **Adaptability** (25)  
+  Ability to learn and ramp effectively when required
+
+- **Context Fit** (25)  
+  Exposure to production, real-world environments, and work context
+
+### Risk Deductions
+
+- Risks are **not pre-applied**
+- Points are deducted **only if concrete risks are detected**
+- Each risk deducts a small, explicit number of points
+- If no risks exist, no deductions are applied
+
+### Adjustments
+
+- Education fit
+- Full-time constraints
+- Cover letter impact (optional)
+
+Adjustments modify the score transparently and are explained separately.
+
+---
+
+## Input Methods
+
+### Resume Input
+- Paste plain text directly
+- Upload PDF (.pdf)
+- Upload DOCX (.docx)
+
+All files are converted into plain text and shown to the user before analysis.
+Users can review and edit extracted text.
+
+---
+
+## Tech Stack
+
+- React (Vite)
+- JavaScript (no backend)
+- pdfjs-dist (PDF text extraction)
+- mammoth (DOCX text extraction)
+
+---
+
+## Why JobLens Exists
+
+Most tools hide reasoning behind opaque scores.
+JobLens does the opposite.
+
+It is built to be:
+- honest
+- inspectable
+- debuggable by the user
+- defensible in interviews
+
+---
+
+## License
+
+MIT
