@@ -1,15 +1,15 @@
-# JobLens
+# RoleAudit
 
-**JobLens** is a frontend-only, evidence-based role readiness analysis tool for candidates.
+**RoleAudit** is a frontend-only, evidence-based role readiness analysis tool for candidates.
 
 It analyzes a job description and a resume (text, PDF, or DOCX), extracts verifiable evidence from both, and explains — with proof — how well the resume aligns with the role’s actual expectations.
 
-JobLens does **not** predict hiring outcomes, optimize resumes, or act as an ATS.
+RoleAudit does **not** predict hiring outcomes, optimize resumes, or act as an ATS.
 Its goal is transparency: helping candidates understand *why* they are (or aren’t) a strong fit for a specific role.
 
 ---
 
-## What JobLens Does
+## What RoleAudit Does
 
 - Accepts job descriptions and resumes as plain text, PDF, or DOCX
 - Converts all resumes into editable plain text before analysis
@@ -23,7 +23,7 @@ Every insight is traceable to text the user provided.
 
 ---
 
-## What JobLens Does NOT Do
+## What RoleAudit Does NOT Do
 
 - No machine learning or embeddings
 - No resume rewriting or keyword stuffing
@@ -31,7 +31,7 @@ Every insight is traceable to text the user provided.
 - No hiring probability predictions
 - No black-box “AI insights”
 
-JobLens is intentionally deterministic and explainable.
+RoleAudit is intentionally deterministic and explainable.
 
 ---
 
