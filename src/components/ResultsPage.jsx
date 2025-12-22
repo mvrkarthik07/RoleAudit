@@ -33,7 +33,7 @@ function DimensionCard({ title, dimension, score, maxScore }) {
               padding: "var(--space-1) var(--space-2)", 
               borderRadius: "4px", 
               background: "var(--bg-primary)",
-              color: "var(--text-secondary)",
+              color: getScoreColor(score),
               fontSize: "var(--text-sm)",
               fontWeight: "var(--font-medium)"
             }}>
@@ -217,7 +217,19 @@ function ResultsPage({ analysis, onReset }) {
     setTimeout(() => setDownloadSuccess(false), 2000);
   };
 
-  if (analysis.error) {
+  const getScoreColorClass = (score) => {
+    if (score >= 70) return "score-good";
+    if (score >= 40) return "score-moderate";
+    return "score-low";
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 70) return "var(--success)";
+    if (score >= 40) return "var(--warning)";
+    return "var(--danger)";
+  };
+
+     if (analysis.error) {
     return (
       <div className="card" style={{ maxWidth: "700px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "var(--space-8)" }}>
@@ -240,12 +252,12 @@ function ResultsPage({ analysis, onReset }) {
             What to do:
           </h3>
           <ul style={{ margin: 0, paddingLeft: "var(--space-5)", color: "var(--text-secondary)", lineHeight: "1.8" }}>
-            {analysis.guidance.map((item, i) => (
+          {analysis.guidance.map((item, i) => (
               <li key={i} style={{ marginBottom: "var(--space-2)" }}>
                 {item}
               </li>
-            ))}
-          </ul>
+          ))}
+        </ul>
         </div>
 
         <button onClick={onReset} className="btn btn-primary" style={{ width: "100%" }}>
@@ -267,7 +279,7 @@ function ResultsPage({ analysis, onReset }) {
               margin: "0 0 var(--space-2)", 
               fontSize: "var(--text-4xl)", 
               fontWeight: "var(--font-bold)",
-              color: "var(--text-primary)",
+              color: getScoreColor(score),
               letterSpacing: "-0.02em"
             }}>
               Overall Readiness: {score} / 100
@@ -336,7 +348,7 @@ function ResultsPage({ analysis, onReset }) {
               <div style={{ marginBottom: "var(--space-4)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--space-2)" }}>
                   <strong style={{ color: "var(--text-primary)", fontSize: "var(--text-sm)" }}>Base Readiness:</strong>
-                  <span style={{ color: "var(--text-primary)", fontWeight: "var(--font-semibold)" }}>
+                  <span style={{ color: getScoreColor(analysis.scoreExplanation.baseReadinessScore), fontWeight: "var(--font-semibold)" }}>
                     {analysis.scoreExplanation.baseReadinessScore}/100
                   </span>
                 </div>
@@ -346,12 +358,13 @@ function ResultsPage({ analysis, onReset }) {
                   marginLeft: "var(--space-4)",
                   padding: "var(--space-2)",
                   background: "var(--bg-secondary)",
-                  borderRadius: "var(--radius-sm)"
+                  borderRadius: "var(--radius-sm)",
+                  lineHeight: "1.8"
                 }}>
-                  Role Alignment: {analysis.scoreExplanation.dimensionBreakdown.relevance.score} + 
-                  Skill Realism: {analysis.scoreExplanation.dimensionBreakdown.depth.score} + 
-                  Adaptability: {analysis.scoreExplanation.dimensionBreakdown.adaptability.score} + 
-                  Context Fit: {analysis.scoreExplanation.dimensionBreakdown.environmentFit.score}
+                  Role Alignment: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.relevance.score / analysis.scoreExplanation.dimensionBreakdown.relevance.maxScore) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.relevance.score}</span> + 
+                  Skill Realism: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.depth.score / analysis.scoreExplanation.dimensionBreakdown.depth.maxScore) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.depth.score}</span> + 
+                  Adaptability: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.adaptability.score / analysis.scoreExplanation.dimensionBreakdown.adaptability.maxScore) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.adaptability.score}</span> + 
+                  Context Fit: <span style={{ color: getScoreColor((analysis.scoreExplanation.dimensionBreakdown.environmentFit.score / analysis.scoreExplanation.dimensionBreakdown.environmentFit.maxScore) * 100) }}>{analysis.scoreExplanation.dimensionBreakdown.environmentFit.score}</span>
                 </div>
               </div>
               
@@ -386,7 +399,7 @@ function ResultsPage({ analysis, onReset }) {
               <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <strong style={{ color: "var(--text-primary)", fontSize: "var(--text-sm)" }}>Score After Risk Deduction:</strong>
-                  <span style={{ color: "var(--text-primary)", fontWeight: "var(--font-semibold)" }}>
+                  <span style={{ color: getScoreColor(analysis.scoreExplanation.scoreAfterRisk), fontWeight: "var(--font-semibold)" }}>
                     {analysis.scoreExplanation.scoreAfterRisk} / 100
                   </span>
                 </div>
@@ -460,7 +473,7 @@ function ResultsPage({ analysis, onReset }) {
             </p>
           </div>
           <div style={{ display: "grid", gap: "var(--space-4)" }}>
-            {analysis.roleSummary.map((item, i) => (
+          {analysis.roleSummary.map((item, i) => (
               <div key={i} style={{
                 padding: "var(--space-5)",
                 background: "var(--bg-primary)",
@@ -505,7 +518,7 @@ function ResultsPage({ analysis, onReset }) {
           <div style={{ display: "grid", gap: "var(--space-6)" }}>
             {analysis.pairings.map((pairing, i) => {
               const badgeClass = pairing.classification === "match" ? "badge-success" : 
-                                pairing.classification === "gap" ? "badge-warning" : 
+                                pairing.classification === "gap" ? "badge-danger" : 
                                 pairing.classification === "risk" ? "badge-danger" : "badge-neutral";
 
               return (
@@ -603,10 +616,10 @@ function ResultsPage({ analysis, onReset }) {
           </div>
           <div style={{ display: "grid", gap: "var(--space-4)" }}>
             {analysis.strengths.map((strength, i) => (
-              <div key={i} style={{
+              <div key={i} className="strength-card" style={{
                 padding: "var(--space-5)",
-                background: "var(--bg-primary)",
-                border: "1px solid var(--border)",
+                background: "rgba(16, 185, 129, 0.05)",
+                border: "1px solid rgba(16, 185, 129, 0.2)",
                 borderRadius: "var(--radius-sm)"
               }}>
                 <div style={{ 
@@ -654,10 +667,10 @@ function ResultsPage({ analysis, onReset }) {
           </div>
           <div style={{ display: "grid", gap: "var(--space-4)" }}>
             {analysis.gaps.map((gap, i) => (
-              <div key={i} style={{
+              <div key={i} className="gap-card" style={{
                 padding: "var(--space-5)",
-                background: "var(--bg-primary)",
-                border: "1px solid var(--border)",
+                background: "rgba(239, 68, 68, 0.05)",
+                border: "1px solid rgba(239, 68, 68, 0.2)",
                 borderRadius: "var(--radius-sm)"
               }}>
                 <div style={{ 
@@ -803,7 +816,7 @@ function ResultsPage({ analysis, onReset }) {
           style={{ minWidth: "200px" }}
         >
           Analyze Another Role
-        </button>
+      </button>
       </div>
     </div>
   );

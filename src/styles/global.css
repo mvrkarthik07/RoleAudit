@@ -265,9 +265,34 @@ p {
 }
 
 .badge-neutral {
-  background: rgba(100, 116, 139, 0.15);
-  color: var(--text-tertiary);
-  border: 1px solid rgba(100, 116, 139, 0.2);
+  background: rgba(234, 179, 8, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+/* Score Colors */
+.score-good {
+  color: var(--success);
+}
+
+.score-moderate {
+  color: var(--warning);
+}
+
+.score-low {
+  color: var(--danger);
+}
+
+/* Strengths - Green */
+.strength-card {
+  border-left: 3px solid var(--success);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+/* Gaps - Red */
+.gap-card {
+  border-left: 3px solid var(--danger);
+  background: rgba(239, 68, 68, 0.05);
 }
 
 /* Evidence Citations - Muted, Indented */
