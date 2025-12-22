@@ -42,8 +42,12 @@ function InputPage({ onAnalyze }) {
   }
 
   return (
-    <div className="card" style={{ maxWidth: "900px", margin: "0 auto" }}>
-      <div style={{ marginBottom: "var(--space-10)" }}>
+    <div className="card" style={{ 
+      maxWidth: "900px", 
+      margin: "0 auto",
+      width: "100%"
+    }}>
+      <div style={{ marginBottom: "clamp(var(--space-6), 6vw, var(--space-10))" }}>
         <h2 style={{ margin: "0 0 var(--space-2)", color: "var(--text-primary)" }}>
           Job Description
         </h2>
@@ -104,7 +108,9 @@ function InputPage({ onAnalyze }) {
           <span style={{ 
             marginLeft: "var(--space-3)", 
             fontSize: "var(--text-sm)", 
-            color: "var(--text-tertiary)"
+            color: "var(--text-tertiary)",
+            display: "inline-block",
+            marginTop: "var(--space-2)"
           }}>
             or paste text below
           </span>
@@ -194,7 +200,11 @@ function InputPage({ onAnalyze }) {
           onClick={() => onAnalyze(jd, resume, coverLetter)}
           disabled={!jd || !resume || isParsing}
           className="btn btn-primary"
-          style={{ minWidth: "200px" }}
+          style={{ 
+            minWidth: "200px",
+            width: "100%",
+            maxWidth: "400px"
+          }}
         >
           Analyze Role Readiness
         </button>

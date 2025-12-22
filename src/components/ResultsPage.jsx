@@ -271,17 +271,26 @@ function ResultsPage({ analysis, onReset }) {
   const score = analysis.scoreExplanation?.overallExplanation?.score || analysis.score;
 
   return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+    <div style={{ 
+      maxWidth: "1100px", 
+      margin: "0 auto",
+      width: "100%",
+      padding: "0 var(--space-4)"
+    }}>
       {/* Overall Readiness - Visually Dominant */}
       {analysis.scoreExplanation && analysis.scoreExplanation.overallExplanation && (
-        <div className="card" style={{ marginBottom: "var(--space-8)", textAlign: "center" }}>
+        <div className="card" style={{ 
+          marginBottom: "clamp(var(--space-6), 5vw, var(--space-8))", 
+          textAlign: "center" 
+        }}>
           <div style={{ marginBottom: "var(--space-6)" }}>
             <h1 style={{ 
               margin: "0 0 var(--space-2)", 
-              fontSize: "var(--text-4xl)", 
+              fontSize: "clamp(var(--text-2xl), 8vw, var(--text-4xl))", 
               fontWeight: "var(--font-bold)",
               color: getScoreColor(score || 0),
-              letterSpacing: "-0.02em"
+              letterSpacing: "-0.02em",
+              wordBreak: "break-word"
             }}>
               Overall Readiness: {score || 0} / 100
             </h1>
@@ -294,6 +303,19 @@ function ResultsPage({ analysis, onReset }) {
               {analysis.band}
             </p>
           </div>
+          
+          <p style={{ 
+            margin: "var(--space-4) 0 var(--space-6)", 
+            fontSize: "var(--text-sm)", 
+            color: "var(--text-tertiary)",
+            lineHeight: "1.6",
+            maxWidth: "700px",
+            marginLeft: "auto",
+            marginRight: "auto",
+            fontStyle: "italic"
+          }}>
+            This score reflects readiness and alignment, not hiring probability.
+          </p>
           
           <p style={{ 
             margin: "0 0 var(--space-6)", 
@@ -316,12 +338,22 @@ function ResultsPage({ analysis, onReset }) {
             <button
               onClick={handleDownload}
               className="btn btn-secondary"
+              style={{
+                flex: "1 1 auto",
+                minWidth: "140px",
+                maxWidth: "200px"
+              }}
             >
               {downloadSuccess ? "Downloaded" : "Download Report"}
             </button>
             <button
               onClick={handleCopy}
               className="btn btn-secondary"
+              style={{
+                flex: "1 1 auto",
+                minWidth: "140px",
+                maxWidth: "200px"
+              }}
             >
               {copySuccess ? "Copied" : "Copy Analysis"}
             </button>
@@ -481,7 +513,11 @@ function ResultsPage({ analysis, onReset }) {
               Each requirement is backed by specific text from the job description.
             </p>
           </div>
-          <div style={{ display: "grid", gap: "var(--space-4)" }}>
+          <div style={{ 
+            display: "grid", 
+            gap: "var(--space-4)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))"
+          }}>
           {analysis.roleSummary.map((item, i) => (
               <div key={i} style={{
                 padding: "var(--space-5)",
@@ -623,7 +659,11 @@ function ResultsPage({ analysis, onReset }) {
               Areas where your resume aligns with JD requirements.
             </p>
           </div>
-          <div style={{ display: "grid", gap: "var(--space-4)" }}>
+          <div style={{ 
+            display: "grid", 
+            gap: "var(--space-4)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))"
+          }}>
             {analysis.strengths.map((strength, i) => (
               <div key={i} className="strength-card" style={{
                 padding: "var(--space-5)",
@@ -674,7 +714,11 @@ function ResultsPage({ analysis, onReset }) {
               Areas where JD requirements don't match your resume evidence.
             </p>
           </div>
-          <div style={{ display: "grid", gap: "var(--space-4)" }}>
+          <div style={{ 
+            display: "grid", 
+            gap: "var(--space-4)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))"
+          }}>
             {analysis.gaps.map((gap, i) => (
               <div key={i} className="gap-card" style={{
                 padding: "var(--space-5)",
@@ -751,7 +795,11 @@ function ResultsPage({ analysis, onReset }) {
               Areas that may require attention or clarification.
             </p>
           </div>
-          <div style={{ display: "grid", gap: "var(--space-4)" }}>
+          <div style={{ 
+            display: "grid", 
+            gap: "var(--space-4)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))"
+          }}>
             {analysis.risks.map((risk, i) => (
               <div key={i} style={{
                 padding: "var(--space-5)",

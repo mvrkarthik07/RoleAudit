@@ -364,6 +364,48 @@ p {
   .btn {
     width: 100%;
   }
+
+  .evidence {
+    padding-left: var(--space-4);
+    font-size: var(--text-xs);
+  }
+}
+
+/* Mobile - Small screens */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--space-3);
+  }
+
+  .card {
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  h1 { font-size: var(--text-xl); }
+  h2 { font-size: var(--text-lg); }
+  h3 { font-size: var(--text-base); }
+
+  .btn {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .textarea {
+    min-height: 100px;
+  }
+
+  /* Single column grids on mobile */
+  [style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    padding: 0 var(--space-5);
+  }
 }
 
 /* Spinner Animation */

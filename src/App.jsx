@@ -144,12 +144,14 @@ function App() {
         <div className="container" style={{ 
           display: "flex", 
           alignItems: "center", 
-          justifyContent: "space-between"
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "var(--space-3)"
         }}>
           <div>
             <h1 style={{ 
               margin: 0, 
-              fontSize: "var(--text-xl)", 
+              fontSize: "clamp(var(--text-lg), 4vw, var(--text-xl))", 
               fontWeight: "var(--font-semibold)",
               color: "var(--text-primary)"
             }}>
@@ -157,7 +159,7 @@ function App() {
             </h1>
             <p style={{ 
               margin: "var(--space-1) 0 0", 
-              fontSize: "var(--text-sm)", 
+              fontSize: "clamp(var(--text-xs), 2.5vw, var(--text-sm))", 
               color: "var(--text-tertiary)"
             }}>
               Role Readiness Analysis
@@ -167,6 +169,9 @@ function App() {
             <button
               onClick={() => setAnalysis(null)}
               className="btn btn-secondary"
+              style={{
+                flexShrink: 0
+              }}
             >
               New Analysis
             </button>
@@ -174,7 +179,7 @@ function App() {
         </div>
       </header>
 
-      <main style={{ flex: 1, padding: "var(--space-8) 0" }}>
+      <main style={{ flex: 1, padding: "clamp(var(--space-4), 5vw, var(--space-8)) 0" }}>
         <div className="container">
           {isAnalyzing ? (
             <div className="card" style={{ textAlign: "center", maxWidth: "600px", margin: "0 auto" }}>
