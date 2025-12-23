@@ -71,10 +71,10 @@ function InputPage({ onAnalyze }) {
       <div style={{ 
         height: "1px", 
         background: "var(--border)", 
-        margin: "var(--space-10) 0" 
+        margin: "clamp(var(--space-6), 6vw, var(--space-10)) 0" 
       }}></div>
 
-      <div style={{ marginBottom: "var(--space-10)" }}>
+      <div style={{ marginBottom: "clamp(var(--space-6), 6vw, var(--space-10))" }}>
         <h2 style={{ margin: "0 0 var(--space-2)", color: "var(--text-primary)" }}>
           Resume
         </h2>
@@ -196,8 +196,8 @@ function InputPage({ onAnalyze }) {
         borderTop: "1px solid var(--border)",
         textAlign: "center"
       }}>
-        <button
-          onClick={() => onAnalyze(jd, resume, coverLetter)}
+      <button
+        onClick={() => onAnalyze(jd, resume, coverLetter)}
           disabled={!jd || !resume || isParsing}
           className="btn btn-primary"
           style={{ 
@@ -205,9 +205,9 @@ function InputPage({ onAnalyze }) {
             width: "100%",
             maxWidth: "400px"
           }}
-        >
-          Analyze Role Readiness
-        </button>
+      >
+        Analyze Role Readiness
+      </button>
         {(!jd || !resume) && (
           <p style={{ 
             margin: "var(--space-4) 0 0", 

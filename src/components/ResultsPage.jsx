@@ -206,9 +206,44 @@ function DimensionCard({ title, dimension, score, maxScore }) {
   );
 }
 
+function AdjustmentRow({ label, value, helper, tone = "default" }) {
+  const toneColor = tone === "danger"
+    ? "var(--danger)"
+    : tone === "emphasis"
+    ? "var(--text-primary)"
+    : "var(--text-secondary)";
+
+  return (
+    <div style={{ 
+      padding: "var(--space-3)", 
+      background: "var(--bg-secondary)", 
+      borderRadius: "var(--radius-sm)", 
+      border: "1px solid var(--border)" 
+    }}>
+      <div style={{ 
+        fontSize: "var(--text-sm)", 
+        color: "var(--text-primary)", 
+        fontWeight: "var(--font-semibold)", 
+        marginBottom: "var(--space-1)" 
+      }}>
+        {label}
+      </div>
+      <div style={{ fontWeight: "var(--font-medium)", color: toneColor }}>
+        {value}
+      </div>
+      {helper && (
+        <div style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", marginTop: "var(--space-1)", lineHeight: "1.6" }}>
+          {helper}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ResultsPage({ analysis, onReset }) {
   const [copySuccess, setCopySuccess] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const adjustments = analysis.adjustments || analysis.scoreExplanation?.adjustments;
 
   const handleCopy = async () => {
     const success = await copyAnalysisToClipboard(analysis);
@@ -457,6 +492,57 @@ function ResultsPage({ analysis, onReset }) {
                   Additional adjustments (cover letter impact, score smoothing, and education/full-time fit multipliers) applied to reach the final score.
                 </div>
               )}
+
+              {adjustments && (
+                <div style={{ 
+                  marginTop: "var(--space-4)", 
+                  paddingTop: "var(--space-4)", 
+                  borderTop: "1px solid var(--border)" 
+                }}>
+                  <div style={{ 
+                    marginBottom: "var(--space-3)", 
+                    fontWeight: "var(--font-semibold)", 
+                    color: "var(--text-primary)",
+                    fontSize: "var(--text-sm)"
+                  }}>
+                    How this score moved from base to final
+                  </div>
+                  <div style={{ 
+                    display: "grid", 
+                    gap: "var(--space-2)", 
+                    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))"
+                  }}>
+                    <AdjustmentRow label="Base readiness (4 dimensions)" value={`${adjustments.baseReadinessScore ?? 0} / 100`} />
+                    <AdjustmentRow label="Risk deduction" value={`-${adjustments.riskPenalty ?? 0} pts`} tone="danger" />
+                    <AdjustmentRow label="After risk" value={`${adjustments.scoreAfterRisk ?? 0} / 100`} />
+                    <AdjustmentRow 
+                      label="Cover letter impact" 
+                      value={`${adjustments.coverLetterModifier >= 0 ? "+" : ""}${adjustments.coverLetterModifier ?? 0} pts`} 
+                      helper={adjustments.coverLetterExplanation} 
+                    />
+                    <AdjustmentRow 
+                      label="Smoothing tweak" 
+                      value={`${adjustments.smoothingAdjustment >= 0 ? "+" : ""}${adjustments.smoothingAdjustment ?? 0}`} 
+                      helper={`Adjusted score: ${adjustments.smoothingAdjustedScore ?? adjustments.scoreAfterRisk ?? ""}`}
+                    />
+                    <AdjustmentRow 
+                      label="Education fit multiplier" 
+                      value={`×${(adjustments.educationFitMultiplier ?? 1).toFixed(2)}`} 
+                      helper={adjustments.educationFitMultiplier < 1 ? "Major/degree mismatch reduced the score." : "No education penalty applied."}
+                    />
+                    <AdjustmentRow 
+                      label="Full-time fit multiplier" 
+                      value={`×${(adjustments.fullTimeMultiplier ?? 1).toFixed(2)}`} 
+                    />
+                    <AdjustmentRow 
+                      label="Final score" 
+                      value={`${adjustments.finalScore ?? analysis.score ?? 0} / 100`} 
+                      tone="emphasis"
+                      helper={`Pre-clamp: ${(adjustments.preMultiplierScore ?? adjustments.finalScore ?? 0).toFixed(1)}`}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </details>
         </div>
@@ -560,7 +646,11 @@ function ResultsPage({ analysis, onReset }) {
               Each dimension shows JD expectations paired with your resume evidence.
             </p>
           </div>
-          <div style={{ display: "grid", gap: "var(--space-6)" }}>
+          <div style={{ 
+            display: "grid", 
+            gap: "var(--space-6)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))"
+          }}>
             {analysis.pairings.map((pairing, i) => {
               const badgeClass = pairing.classification === "match" ? "badge-success" : 
                                 pairing.classification === "gap" ? "badge-danger" : 

@@ -10,6 +10,12 @@ export function scoreEducationFit(jdEducationRequirements, resumeEducationBackgr
     return 1.0;
   }
 
+  // Heuristic: if JD text explicitly says any/all majors/disciplines, treat as open
+  const rawEducationText = (jdEducationRequirements.rawEducationRequirements || []).join(" ").toLowerCase();
+  if (/\b(any|all)\s+(major|majors|discipline|disciplines|field|fields)\b/.test(rawEducationText)) {
+    return 1.0;
+  }
+
   // If no education requirement specified, return ~0.9
   if (!jdEducationRequirements.rawEducationRequirements || 
       jdEducationRequirements.rawEducationRequirements.length === 0) {
@@ -25,13 +31,43 @@ export function scoreEducationFit(jdEducationRequirements, resumeEducationBackgr
   const jdTokens = normalizeEducationRequirements(jdEducationRequirements.rawEducationRequirements);
   const resumeTokens = normalizeEducation(resumeEducationBackground);
 
+  const broadEngineeringTerms = new Set([
+    "engineering", "engineer", "technology", "tech", "computer", "computers",
+    "computing", "software", "cs", "it", "information", "systems",
+    "informationtechnology", "information-technology", "electrical",
+    "electronics", "mechanical"
+  ]);
+
+  const mainstreamTerms = new Set([
+    "business", "finance", "financial", "economics", "marketing", "management",
+    "accounting", "analytics", "analyst", "analysis", "data", "statistics",
+    "math", "mathematics", "science", "sciences", "stem", "design"
+  ]);
+
+  const jdIsBroadEngineering = jdTokens.length > 0 && jdTokens.every(t => broadEngineeringTerms.has(t));
+  const resumeHasEngineering = resumeTokens.some(t => broadEngineeringTerms.has(t));
+  const jdIsMainstream = jdTokens.length > 0 && jdTokens.every(t => broadEngineeringTerms.has(t) || mainstreamTerms.has(t));
+  const resumeHasMainstream = resumeTokens.some(t => broadEngineeringTerms.has(t) || mainstreamTerms.has(t));
+
+  if (jdIsBroadEngineering) {
+    // Treat broad engineering/technology asks as general STEM; be lenient
+    if (resumeHasEngineering) return 1.0;
+    return 0.9; // soft floor for adjacent STEM fields
+  }
+
+  if (jdIsMainstream) {
+    // Broad mainstream asks (business/finance/analytics/etc.)—be lenient
+    if (resumeHasMainstream) return 1.0;
+    return 0.9;
+  }
+
   // If no meaningful tokens extracted, default to moderate match
   if (jdTokens.length === 0) {
-    return 0.85;
+    return 0.9; // slightly more lenient
   }
 
   if (resumeTokens.length === 0) {
-    return 0.6;
+    return 0.7; // softer penalty for unspecified
   }
 
   // Compute token overlap similarity
@@ -102,21 +138,21 @@ function mapOverlapToMultiplier(overlap, jdTokenCount, resumeTokenCount) {
     return 1.0;
   }
 
-  // Related field (0.3 to 0.6) → ~0.85
+  // Related field (0.3 to 0.6) → ~0.9
   if (overlap >= 0.3) {
-    // Scale between 0.85 and 1.0 based on overlap
-    return 0.85 + (overlap - 0.3) * (0.15 / 0.3);
+    // Scale between 0.9 and 1.0 based on overlap
+    return 0.9 + (overlap - 0.3) * (0.1 / 0.3);
   }
 
-  // Weak overlap (0.1 to 0.3) → ~0.7
+  // Weak overlap (0.1 to 0.3) → ~0.75
   if (overlap >= 0.1) {
-    // Scale between 0.7 and 0.85 based on overlap
-    return 0.7 + (overlap - 0.1) * (0.15 / 0.2);
+    // Scale between 0.75 and 0.9 based on overlap
+    return 0.75 + (overlap - 0.1) * (0.15 / 0.2);
   }
 
-  // Clear mismatch (< 0.1) → ~0.5
-  // Scale between 0.5 and 0.7 based on overlap
-  return 0.5 + overlap * 2.0;
+  // Clear mismatch (< 0.1) → ~0.6
+  // Scale between 0.6 and 0.75 based on overlap
+  return 0.6 + overlap * 1.5;
 }
 
 /**

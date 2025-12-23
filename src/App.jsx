@@ -97,12 +97,28 @@ function App() {
           jdEducationRequirements,
           resume
         );
-        const finalScore = Math.round(
-          smoothedScore * educationFitMultiplier * fullTimeMultiplier
-        );
+        const preMultiplierScore = smoothedScore * educationFitMultiplier * fullTimeMultiplier;
+        const finalScore = Math.round(preMultiplierScore);
         const clampedFinalScore = Math.max(0, Math.min(100, finalScore));
         const jdEvidence = extractJDEvidence(jd);
         const resumeEvidence = extractResumeEvidence(resume, jdEducationRequirements);
+        const smoothingAdjustment = Math.round(
+          (smoothedScore - coverLetterResult.adjustedScore) * 10
+        ) / 10;
+        const adjustments = {
+          baseReadinessScore,
+          riskPenalty,
+          scoreAfterRisk,
+          coverLetterModifier: coverLetterResult.modifier,
+          coverLetterExplanation: coverLetterResult.explanation,
+          coverLetterAdjustedScore: coverLetterResult.adjustedScore,
+          smoothingAdjustment,
+          smoothingAdjustedScore: smoothedScore,
+          educationFitMultiplier,
+          fullTimeMultiplier,
+          preMultiplierScore: Math.round(preMultiplierScore * 10) / 10,
+          finalScore: clampedFinalScore
+        };
         const finalAnalysis = generateAnalysis(
           jdEvidence,
           resumeEvidence,
@@ -115,6 +131,10 @@ function App() {
           }
         );
         finalAnalysis.coverLetterImpact = coverLetterResult;
+        finalAnalysis.adjustments = adjustments;
+        if (finalAnalysis.scoreExplanation) {
+          finalAnalysis.scoreExplanation.adjustments = adjustments;
+        }
         setAnalysis(finalAnalysis);
       } catch (error) {
         console.error("Analysis failed:", error);
