@@ -155,11 +155,15 @@ function App() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <header style={{
-        padding: "var(--space-12) 0",
+        padding: "var(--space-12)",
         borderBottom: "1px solid var(--border)",
-        background: "var(--bg-secondary)"
+        background: "var(--bg-secondary)",
+        borderTop: "1px solid var(--border)",
+       
+        margin: "0 auto",
+        width: "100%"
       }}>
         <div className="container" style={{ 
          display: "flex",
