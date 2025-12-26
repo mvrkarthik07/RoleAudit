@@ -155,32 +155,38 @@ function App() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
       <header style={{
-        padding: "var(--space-4) 0",
+        padding: "var(--space-12) 0",
         borderBottom: "1px solid var(--border)",
         background: "var(--bg-secondary)"
       }}>
         <div className="container" style={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: "var(--space-3)"
+         display: "flex",
+         flexDirection: "column",
+         alignItems: "center",
+         justifyContent: "center",
+          gap: "var(--space-4)",
+        textAlign: "center",
+        
         }}>
           <div>
             <h1 style={{ 
-              margin: 0, 
-              fontSize: "clamp(var(--text-lg), 4vw, var(--text-xl))", 
-              fontWeight: "var(--font-semibold)",
-              color: "var(--text-primary)"
+              
+              fontSize: "clamp(2.5rem, 4vw, 5rem)", 
+              fontWeight: "var(--font-bold)",
+              color: "var(--text-primary)",
+              letterSpacing: "0.1rem"
+              
+              
             }}>
               RoleAudit
             </h1>
             <p style={{ 
               margin: "var(--space-1) 0 0", 
-              fontSize: "clamp(var(--text-xs), 2.5vw, var(--text-sm))", 
-              color: "var(--text-tertiary)"
+              fontSize: "clamp(0.75rem, 2.5vw, 1.5rem)", 
+              color: "var(--text-tertiary)",
+              
             }}>
               Role Readiness Analysis
             </p>
@@ -190,7 +196,9 @@ function App() {
               onClick={() => setAnalysis(null)}
               className="btn btn-secondary"
               style={{
-                flexShrink: 0
+                flexShrink: 0,
+                minWidth: "150px",
+                
               }}
             >
               New Analysis
@@ -230,7 +238,8 @@ function App() {
       <footer style={{ 
         padding: "var(--space-6) 0", 
         borderTop: "1px solid var(--border)", 
-        background: "var(--bg-secondary)"
+        background: "var(--bg-secondary)",
+        marginTop: "auto"
       }}>
         <div className="container" style={{ textAlign: "center" }}>
           <p style={{ 
